@@ -6,7 +6,11 @@ else
   gem 'debugger'
 end
 
-gem 'rspec-rails', '~> 2.11.0', group: [:development, :test]
+group :development, :test do
+  gem 'rspec-rails', '~> 2.11.0'
+  gem 'ephemeral_response'
+end
+
 group :test do
   # gem 'cucumber-rails', :require => false
   gem 'database_cleaner', '~> 0.8.0'

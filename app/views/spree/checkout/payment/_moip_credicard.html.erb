@@ -1,7 +1,7 @@
 <%= hidden_field "payment_source[#{payment_method.id}]", 'order_id', value: @order.id %>
 <%= hidden_field "payment_source[#{payment_method.id}]", 'code_moip', id: 'code_moip' %>
 
-<p><% @response ||= ApiMoip.authorize({ :reason => "Product X", :id => "R#{rand(10_000)}", :value => 1.00, :domain => 'example.com' }) %></p>
+<p><% @response ||= Moip.authorize({ :reason => "Product X", :id => "R#{rand(10_000)}", :value => 1.00 }) %></p>
 
 <%= image_tag 'creditcards/creditcard.gif', :id => 'creditcard-image' %>
 <% param_prefix = "payment_source[#{payment_method.id}]" %>

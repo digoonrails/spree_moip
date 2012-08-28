@@ -14,6 +14,18 @@ Dir[File.join(File.dirname(__FILE__), 'support/**/*.rb')].each { |f| require f }
 require 'spree/core/testing_support/factories'
 require 'spree/core/url_helpers'
 
+EphemeralResponse.configure do |config|
+  config.fixture_directory = "spec/fixtures/responses"
+  config.expiration        = 86400
+  config.skip_expiration   = true
+  config.white_list        = 'localhost'
+
+  # config.register(URI.parse(SpreeMoip::CONFIG["uri"]).host) do |request|
+  config.register(URI.parse('https://desenvolvedor.moip.com.br/sandbox').host) do |request|
+    "#{request.uri.host}#{request.method}#{request.path}"
+  end  
+end
+
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
 
