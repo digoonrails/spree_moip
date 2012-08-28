@@ -1,0 +1,5 @@
+---
+pt-BR:
+  name_in_card: 'Nome igual do cartão'
+  ident: 'Cpf'
+  born_at: 'Data de nascimento'

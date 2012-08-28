@@ -1,0 +1,71 @@
+<%= hidden_field "payment_source[#{payment_method.id}]", 'order_id', value: @order.id %>
+<%= hidden_field "payment_source[#{payment_method.id}]", 'code_moip', id: 'code_moip' %>
+
+<p><% @response ||= ApiMoip.authorize({ :reason => "Product X", :id => "R#{rand(10_000)}", :value => 1.00, :domain => 'example.com' }) %></p>
+
+<%= image_tag 'creditcards/creditcard.gif', :id => 'creditcard-image' %>
+<% param_prefix = "payment_source[#{payment_method.id}]" %>
+
+<p class='field' data-hook="card_cc_type">
+  <%= label_tag "Bandeira" %>
+	<%= select_tag "#{param_prefix}[cc_type]", options_for_select({ "Visa" => "Visa", "Mastercard" => "Mastercard" }), :id => 'card_type' %>
+	<span class="required">*</span>
+</p>
+
+<p class='field' data-hook='card_name_in'>
+  <%= label_tag nil, t(:name_in_card) %>
+  <%= text_field param_prefix, 'name_in_card', :value => "#{@order.billing_firstname} #{@order.billing_lastname}", :id => 'name_in_card' %>
+  <span class="required">*</span>
+</p>
+
+<p class="field" data-hook="card_number">
+  <%= label_tag nil, t(:card_number) %>
+  <% options_hash = Rails.env.production? ? {:autocomplete => 'off'} : {} %>
+  <%= text_field_tag "#{param_prefix}[number]", '', options_hash.merge(:id => 'card_number', :class => 'required', :size => 19, :maxlength => 19) %>
+  <span class="required">*</span>
+  &nbsp;
+  <span id="card_type" style="display:none;">
+    ( <span id="looks_like" ><%= t(:card_type_is) %> <span id="type"></span></span>
+      <span id="unrecognized"><%= t(:unrecognized_card_type) %></span>
+    )
+  </span>
+</p>
+<p class="field" data-hook="card_expiration">
+  <%= label_tag nil, t(:expiration) %>
+  <%= select_month(Date.today, { :prefix => param_prefix, :field_name => 'month', :use_month_numbers => true }, :class => 'required', :id => 'card_month') %>
+  <%= select_year(Date.today, { :prefix => param_prefix, :field_name => 'year', :start_year => Date.today.year, :end_year => Date.today.year + 15 }, :class => 'required', :id => 'card_year') %>
+  <span class="required">*</span>
+</p>
+<p class="field" data-hook="cart_code">
+  <%= label_tag nil, t(:card_code) %>
+  <%= text_field_tag "#{param_prefix}[verification_value]", '', options_hash.merge(:id => 'card_code', :class => 'required', :size => 5) %>
+  <span class="required">*</span>
+  <%= link_to "(#{t(:whats_this)})", spree.content_path('cvv'), :target => '_blank', :onclick => "window.open(this.href,'cvv_info','left=20,top=20,width=500,height=500,toolbar=0,resizable=0,scrollbars=1');return false", "data-hook" => "cvv_link" %>
+</p>
+
+
+<fieldset>
+  <legend>Dados do Proprietário do cartão</legend>
+  <p class='field'>
+    <%= label_tag nil, t(:phone) %>
+    <%= text_field_tag "#{param_prefix}[phone]", '', id: 'phone' %>
+  </p>
+  <p class='field'>
+    <%= label_tag nil, t(:ident) %>
+    <%= text_field_tag "#{param_prefix}[ident]", '', id: 'ident' %>
+  </p>
+  <p class='field'>
+    <%= label_tag nil, t(:born_at) %>
+    <%= text_field_tag "#{param_prefix}[born_at]", '', id: 'born_at' %>
+  </p>
+</fieldset>
+
+<div id="MoipWidget" data-token="<%= @response['Token'] %>" callback-method-success="payment_success" callback-method-error="payment_fail"></div>
+
+<%= content_for :head do %>
+  <% unless Rails.env.production? %>
+    <script type='text/javascript' 
+      src='https://desenvolvedor.moip.com.br/sandbox/transparente/MoipWidget-v2.js' 
+      charset='ISO-8859-1'></script>
+  <% end %>
+<% end %>
