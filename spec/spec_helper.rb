@@ -14,17 +14,9 @@ Dir[File.join(File.dirname(__FILE__), 'support/**/*.rb')].each { |f| require f }
 require 'spree/core/testing_support/factories'
 require 'spree/core/url_helpers'
 
-EphemeralResponse.configure do |config|
-  config.fixture_directory = "spec/fixtures/responses"
-  config.expiration        = 86400
-  config.skip_expiration   = true
-  config.white_list        = 'localhost'
+require 'database_cleaner'
+require 'paperclip/matchers'
 
-  # config.register(URI.parse(SpreeMoip::CONFIG["uri"]).host) do |request|
-  config.register(URI.parse('https://desenvolvedor.moip.com.br/sandbox').host) do |request|
-    "#{request.uri.host}#{request.method}#{request.path}"
-  end  
-end
 
 RSpec.configure do |config|
   config.include FactoryGirl::Syntax::Methods
@@ -52,5 +44,115 @@ RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
   # examples within a transaction, remove the following line or assign false
   # instead of true.
-  config.use_transactional_fixtures = true
+  config.use_transactional_fixtures = false
+
+  config.before(:each) do
+    if example.metadata[:js]
+      DatabaseCleaner.strategy = :truncation, { :except => ['spree_countries', 'spree_zones', 'spree_zone_members', 'spree_states', 'spree_roles'] }
+    else
+      DatabaseCleaner.strategy = :transaction
+    end
+  end
+
+  config.before(:each) do
+    DatabaseCleaner.start
+    reset_spree_preferences
+  end
+
+  config.after(:each) do
+    DatabaseCleaner.clean
+  end
+end
+
+
+shared_context "custom products" do
+  before(:each) do
+    reset_spree_preferences do |config|
+      config.allow_backorders = true
+    end
+
+    taxonomy = FactoryGirl.create(:taxonomy, :name => 'Categories')
+    root = taxonomy.root
+    clothing_taxon = FactoryGirl.create(:taxon, :name => 'Clothing', :parent_id => root.id)
+    bags_taxon = FactoryGirl.create(:taxon, :name => 'Bags', :parent_id => root.id)
+    mugs_taxon = FactoryGirl.create(:taxon, :name => 'Mugs', :parent_id => root.id)
+
+    taxonomy = FactoryGirl.create(:taxonomy, :name => 'Brands')
+    root = taxonomy.root
+    apache_taxon = FactoryGirl.create(:taxon, :name => 'Apache', :parent_id => root.id)
+    rails_taxon = FactoryGirl.create(:taxon, :name => 'Ruby on Rails', :parent_id => root.id)
+    ruby_taxon = FactoryGirl.create(:taxon, :name => 'Ruby', :parent_id => root.id)
+
+    FactoryGirl.create(:custom_product, :name => 'Ruby on Rails Ringer T-Shirt', :price => '19.99', :taxons => [rails_taxon, clothing_taxon])
+    FactoryGirl.create(:custom_product, :name => 'Ruby on Rails Mug', :price => '15.99', :taxons => [rails_taxon, mugs_taxon])
+    FactoryGirl.create(:custom_product, :name => 'Ruby on Rails Tote', :price => '15.99', :taxons => [rails_taxon, bags_taxon])
+    FactoryGirl.create(:custom_product, :name => 'Ruby on Rails Bag', :price => '22.99', :taxons => [rails_taxon, bags_taxon])
+    FactoryGirl.create(:custom_product, :name => 'Ruby on Rails Baseball Jersey', :price => '19.99', :taxons => [rails_taxon, clothing_taxon])
+    FactoryGirl.create(:custom_product, :name => 'Ruby on Rails Stein', :price => '16.99', :taxons => [rails_taxon, mugs_taxon])
+    FactoryGirl.create(:custom_product, :name => 'Ruby on Rails Jr. Spaghetti', :price => '19.99', :taxons => [rails_taxon, clothing_taxon])
+    FactoryGirl.create(:custom_product, :name => 'Ruby Baseball Jersey', :price => '19.99', :taxons => [ruby_taxon, clothing_taxon])
+    FactoryGirl.create(:custom_product, :name => 'Apache Baseball Jersey', :price => '19.99', :taxons => [apache_taxon, clothing_taxon])
+  end
+end
+
+
+shared_context "product prototype" do
+
+  def build_option_type_with_values(name, values)
+    ot = FactoryGirl.create(:option_type, :name => name)
+    values.each do |val|
+      ot.option_values.create({:name => val.downcase, :presentation => val}, :without_protection => true)
+    end
+    ot
+  end
+
+  let(:product_attributes) do
+    # FactoryGirl.attributes_for is un-deprecated!
+    #   https://github.com/thoughtbot/factory_girl/issues/274#issuecomment-3592054
+    FactoryGirl.attributes_for(:simple_product)
+  end
+
+  let(:prototype) do
+    size = build_option_type_with_values("size", %w(Small Medium Large))
+    FactoryGirl.create(:prototype, :name => "Size", :option_types => [ size ])
+  end
+
+  let(:option_values_hash) do
+    hash = {}
+    prototype.option_types.each do |i|
+      hash[i.id.to_s] = i.option_value_ids
+    end
+    hash
+  end
+
+end
+
+
+
+PAYMENT_STATES = Spree::Payment.state_machine.states.keys unless defined? PAYMENT_STATES
+SHIPMENT_STATES = Spree::Shipment.state_machine.states.keys unless defined? SHIPMENT_STATES
+ORDER_STATES = Spree::Order.state_machine.states.keys unless defined? ORDER_STATES
+
+# Usage:
+#
+# context "factory" do
+#   it { should have_valid_factory(:address) }
+# end
+RSpec::Matchers.define :have_valid_factory do |factory_name|
+  match do |model|
+    Factory(factory_name).new_record?.should be_false
+  end
+end
+
+
+EphemeralResponse.configure do |config|
+  config.fixture_directory = "spec/fixtures/responses"
+  config.expiration        = 86400
+  config.skip_expiration   = true
+  config.white_list        = 'localhost'
+
+  # config.register(URI.parse(SpreeMoip::CONFIG["uri"]).host) do |request|
+  config.register(URI.parse('https://desenvolvedor.moip.com.br/sandbox').host) do |request|
+    "#{request.uri.host}#{request.method}#{request.path}"
+  end  
 end

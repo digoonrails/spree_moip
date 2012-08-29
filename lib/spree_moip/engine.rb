@@ -18,5 +18,10 @@ module SpreeMoip
     end
 
     config.to_prepare &method(:activate).to_proc
+    
+    initializer 'spree.register.payment_methods' do |app|
+      app.config.spree.payment_methods <<  Spree::PaymentMethod::Moip
+      app.config.spree.payment_methods
+    end
   end
 end

@@ -18,4 +18,10 @@ FactoryGirl.define do
     :cep "01452-000"
     :telefone "(11)3165-4020"
   end
+  
+  factory :moip_payment_method, :class => Spree::PaymentMethod::Moip do   
+    name 'Credit Card Moip'
+    environment 'test'
+    # active true
+  end
 end

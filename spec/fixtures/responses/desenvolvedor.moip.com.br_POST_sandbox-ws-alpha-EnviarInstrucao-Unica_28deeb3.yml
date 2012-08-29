@@ -1,0 +1,50 @@
+--- !ruby/object:EphemeralResponse::Fixture
+uri: !ruby/object:URI::HTTPS
+  scheme: https
+  user: 
+  password: 
+  host: desenvolvedor.moip.com.br
+  port: 443
+  path: /sandbox/ws/alpha/EnviarInstrucao/Unica
+  query: 
+  opaque: 
+  registry: 
+  fragment: 
+  parser: 
+request: !ruby/object:Net::HTTP::Post
+  method: POST
+  request_has_body: true
+  response_has_body: true
+  path: /sandbox/ws/alpha/EnviarInstrucao/Unica
+  header:
+    accept:
+    - ! '*/*'
+    user-agent:
+    - Ruby
+    authorization:
+    - Basic QkJYREFQVktNQk9NRlI4MEZLQktPUDk3OUw0TVVBTUI6U1k2Q1hFMURMS0ZKV05QQktHTVVZT1RIVjk1RElHWUo0VFVRTTJIVA==
+  body: <EnviarInstrucao><InstrucaoUnica TipoValidacao="Transparent"><Razao>Mensalidade</Razao><IdProprio>7a217b1f7c1cd830d5625b8d2c2780db483b1075</IdProprio><URLRetorno>http://localhost:3000/</URLRetorno><URLNotificacao>http://localhost:3000/</URLNotificacao><Valores><Valor
+    moeda="BRL">1</Valor></Valores><FormasPagamento><FormaPagamento>CartaoCredito</FormaPagamento></FormasPagamento></InstrucaoUnica></EnviarInstrucao>
+  body_stream: 
+  body_data: 
+created_at: 2012-08-29 16:31:53.210789000 -03:00
+response: !ruby/object:Net::HTTPOK
+  http_version: '1.1'
+  code: '200'
+  message: OK
+  header:
+    date:
+    - Wed, 29 Aug 2012 19:31:54 GMT
+    server:
+    - Apache/2.2.3 (CentOS)
+    content-length:
+    - '273'
+    vary:
+    - Accept-Encoding
+    content-type:
+    - text/xml;charset=UTF-8
+  body: <ns1:EnviarInstrucaoUnicaResponse xmlns:ns1="http://www.moip.com.br/ws/alpha/"><Resposta><ID>201208291631546370000000980150</ID><Status>Sucesso</Status><Token>Q200X1F2R0D8S2D9F196D3V1E5Z4P6Q3O7T0K0F0S0Q020C0T9T8H0D1Z530</Token></Resposta></ns1:EnviarInstrucaoUnicaResponse>
+  read: true
+  socket: 
+  body_exist: true
+file_name: desenvolvedor.moip.com.br_POST_sandbox-ws-alpha-EnviarInstrucao-Unica_28deeb3.yml

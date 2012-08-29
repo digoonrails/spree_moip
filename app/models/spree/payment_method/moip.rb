@@ -1,9 +1,5 @@
 module Spree
-  class MoipMethod < PaymentMethod
-    
-    def method_type
-      'moip_credicard'
-    end
+  class PaymentMethod::Moip < PaymentMethod    
     
     # The class that will process payments for this payment type, used for @payment.source
     # e.g. Creditcard in the case of a the Gateway payment type
@@ -18,6 +14,10 @@ module Spree
     
     def process_before_confirm?
       false
+    end
+    
+    def method_type
+      'moip_credicard'
     end
     
     def source_required?
