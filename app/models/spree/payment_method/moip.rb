@@ -5,7 +5,7 @@ module Spree
     # e.g. Creditcard in the case of a the Gateway payment type
     # nil means the payment method doesn't require a source e.g. check
     def payment_source_class
-      MoipCredicard
+      MoipCreditcard
     end
     
     def payment_profiles_supported?
@@ -17,7 +17,7 @@ module Spree
     end
     
     def method_type
-      'moip_credicard'
+      'moip_creditcard'
     end
     
     def source_required?

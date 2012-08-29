@@ -1,22 +1,18 @@
 module Spree
-  class MoipCredicard < ActiveRecord::Base
+  class MoipCreditcard < ActiveRecord::Base
+    
+    self.table_name = 'spree_moip_creditcards'
     
     attr_accessor :number
-    # has_one :payment, :as => :source
-    # delegate :order, :to => :payment
+    
     belongs_to :order
+    has_many :payments, :as => :source, :class_name => "Spree::Payment"
 
-    attr_accessible :number, :month, :year, :verification_value, :first_name, :last_name, :order_id, :cc_type, :last_digits, :name_in_card, :phone, :born_at, :ident, :code_moip
+    attr_accessible :number, :month, :year, :verification_value, :order_id, :cc_type, :last_digits, :name_in_card, :phone, :born_at, :ident, :code_moip
     
-    before_save :last_digits
-    before_save :raise_
+    before_save :set_last_digits
     
-    def raise_
-      p self
-      # raise 'TESTE....'
-    end
-    
-    def last_digits
+    def set_last_digits
       self.last_digits = self.number.to_s[-4,4]
     end
 

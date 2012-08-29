@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Checkout Moip' do
+describe 'Checkout' do
   let(:country) { create(:country, :name => 'Kangaland') }
   before do
     Factory(:state, :name => "Victoria", :country => country)
@@ -66,9 +66,9 @@ describe 'Checkout Moip' do
         fill_in 'ident', :with => '210.665.900-00'
         fill_in 'born_at', :with => '28/12/2012'
         click_button "Save and Continue"
-
+        
+        page.should have_content('Your order has been processed successfully')
         page!
-
       end
     end
   

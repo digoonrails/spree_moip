@@ -17,18 +17,14 @@ require 'spree/core/url_helpers'
 require 'database_cleaner'
 require 'paperclip/matchers'
 
+require 'factory_girl'
+Dir.glob(File.dirname(__FILE__) + "/factories/*").each do |factory|
+  require factory
+end
+
+
 
 RSpec.configure do |config|
-  config.include FactoryGirl::Syntax::Methods
-
-  # == URL Helpers
-  #
-  # Allows access to Spree's routes in specs:
-  #
-  # visit spree.admin_path
-  # current_path.should eql(spree.products_path)
-  config.include Spree::Core::UrlHelpers
-
   # == Mock Framework
   #
   # If you prefer to use mocha, flexmock or RR, uncomment the appropriate line:
@@ -53,15 +49,26 @@ RSpec.configure do |config|
       DatabaseCleaner.strategy = :transaction
     end
   end
-
+  
   config.before(:each) do
     DatabaseCleaner.start
     reset_spree_preferences
   end
-
+  
   config.after(:each) do
     DatabaseCleaner.clean
   end
+  
+  config.include FactoryGirl::Syntax::Methods
+  config.include Paperclip::Shoulda::Matchers
+  # == URL Helpers
+  #
+  # Allows access to Spree's routes in specs:
+  #
+  # visit spree.admin_path
+  # current_path.should eql(spree.products_path)
+  config.include Spree::Core::UrlHelpers
+
 end
 
 
