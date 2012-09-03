@@ -11,7 +11,6 @@ describe Spree::MoipCreditcard do
     end
     
     it "should have last 4 digits" do
-      # card_number = '4984237031754765'
       moip_creditcard = FactoryGirl.create(:moip_creditcard, :number => '4984237031759934')
       moip_creditcard.last_digits.should eql('9934')
     end
