@@ -8,6 +8,7 @@ module SpreeMoip
 
     CONFIG = YAML.load_file(File.join(::Rails.root, 'config', 'gateway.yml'))[::Rails.env]
     STATUS = { 1 => "authorized", 2 => "started", 3 => "printed", 4 => "completed", 5 => "canceled", 6 => "analysing"}
+    BANDEIRAS = {'Visa' => 'Visa', 'Mastercard' => 'Mastercard'}
 
     class << self
       def authorize(attributes = {})

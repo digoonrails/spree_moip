@@ -31,9 +31,7 @@ describe 'Checkout' do
 
         @product.shipping_category = shipping_method.shipping_category
         @product.save!
-      end
-    
-      it "should payment completed successfully" do
+        
         visit spree.root_path
         click_link "RoR Mug"
         click_button "add-to-cart-button"
@@ -55,8 +53,9 @@ describe 'Checkout' do
 
         # Delivery
         click_button "Save and Continue"
-
-        # Payment
+      end
+    
+      it "should payment completed successfully" do    
         select 'Visa', :from => 'card_type'
         fill_in 'card_number', :with => '4984237031754765'
         select '5', :from => 'card_month'
@@ -69,6 +68,23 @@ describe 'Checkout' do
         
         page.should have_content('Your order has been processed successfully')
         page!
+      end
+      
+      it "should not accept without data valid" do
+        select 'Visa', :from => 'card_type'
+        select '5', :from => 'card_month'
+        select "#{Time.now.year+5}", :from => 'card_year'
+                
+        begin
+           click_button "Save and Continue"
+           page.driver.wait_until(page.driver.browser.switch_to.alert.accept)
+        rescue Selenium::WebDriver::Error::UnhandledAlertError => e
+           # may need to use the page.driver.wait_until method to wait until the alert present  other wise you may get the 
+           # No alert is active (Selenium::WebDriver::Error::NoAlertPresentError)
+           #page.driver.browser.switch_to.alert.accept
+           #page.driver.browser.switch_to.alert.dismiss
+           page.should_not have_content('Your order has been processed successfully')
+        end
       end
     end
   
