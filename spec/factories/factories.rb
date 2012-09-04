@@ -24,5 +24,14 @@ FactoryGirl.define do
     environment 'test'
     # active true
   end
+  
+  factory :payment_moip_creditcard, :class => Spree::Payment do
+    amount 45.75
+    payment_method { FactoryGirl.create(:moip_payment_method) }
+    source { FactoryGirl.build(:moip_creditcard) }
+    association(:order, :factory => :order)
+    state 'pending'
+    response_code '12345'
+  end
 
 end

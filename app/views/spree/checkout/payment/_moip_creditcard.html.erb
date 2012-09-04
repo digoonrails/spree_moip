@@ -61,6 +61,7 @@
 <div id="MoipWidget" data-token="<%= @moip_token['Token'] %>" callback-method-success="payment_success" callback-method-error="payment_fail"></div>
 
 <%= content_for :head do %>
+  <% # TODO: Add moip script - production %>
   <% unless Rails.env.production? %>
     <script type='text/javascript' 
       src='https://desenvolvedor.moip.com.br/sandbox/transparente/MoipWidget-v2.js' 

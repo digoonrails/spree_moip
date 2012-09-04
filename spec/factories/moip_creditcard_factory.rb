@@ -2,11 +2,12 @@
 FactoryGirl.define do
   factory :moip_creditcard, :class => Spree::MoipCreditcard  do
     code_moip '123456'
-    order_id '111'
-    cc_type 'Vida'
+    # order { FactoryGirl.create(:order) }
+    association(:order, :factory => :order)
+    cc_type 'Visa'
     month '5'
     year '2015'
-    last_digits '4987'
+    number '1234567812345678'
     verification_value '123'
     name_in_card 'NOME IGUAL CARTAO'
     phone '(18) 3643-9876'
